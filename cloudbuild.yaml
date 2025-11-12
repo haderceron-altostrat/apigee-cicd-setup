@@ -7,23 +7,7 @@ steps:
       - |
         gcloud auth print-access-token > token.txt
         echo "Auth token generated."   
-  # Step 2: List Apigee Environments using apigeecli
-  - name: 'ghcr.io/apigee/apigeecli:latest'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        echo "Listing Apigee Environments..."
-        apigeecli environments list -o "${_APIGEE_ORG}" -t $(cat token.txt)
-  # Step 3: List API Proxies using apigeecli
-  - name: 'ghcr.io/apigee/apigeecli:latest'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        echo "Listing API Proxies..."
-        apigeecli apis list -o "${_APIGEE_ORG}" -t $(cat token.txt)
-  # Step 4: Create API Proxies Bundle using apigeecli
+  # Step 2: Create API Proxies Bundle using apigeecli
   - name: 'ghcr.io/apigee/apigeecli:latest'
     entrypoint: 'sh'
     args:
@@ -31,7 +15,7 @@ steps:
       - |
         echo "Creating Bundle API Proxie..."
         apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p sample.zip -t $(cat token.txt)
-  # Step 4: Create API Proxies Bundle using apigeecli
+  # Step 3: Create API Proxies Bundle using apigeecli
   - name: 'ghcr.io/apigee/apigeecli:latest'
     entrypoint: 'sh'
     args:
@@ -41,9 +25,9 @@ steps:
         apigeecli apis deploy -o "${_APIGEE_ORG}" -n "${_API_NAME}" -e "${_ENVIRONMENT}" -t $(cat token.txt)        
 
 substitutions:
-  _APIGEE_ORG: 'apigee-sandbox-non-vpc' # Default value, will be overridden by trigger
-  _API_NAME: 'apigee-cloudbuild-test' # Default value, will be overridden by trigger
-  _ENVIRONMENT: 'dev' # Default value, will be overridden by trigger
+  _APIGEE_ORG: 'apigee-sandbox-non-vpc'
+  _API_NAME: 'apigee-cloudbuild-test'
+  _ENVIRONMENT: 'dev'
 
 options:
   logging: CLOUD_LOGGING_ONLY
