@@ -14,7 +14,7 @@ steps:
       - '-c'
       - |
         echo "Creating Bundle API Proxy..."
-        apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p sample.zip -t $(cat token.txt) --json > /tmp/deploy-out.txt 
+        apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p sample.zip -t $(cat token.txt) > /tmp/deploy-out.txt 
         echo "Create output:"
         cat /tmp/deploy-out.txt
   # Step 3: Create API Proxies Bundle using apigeecli
