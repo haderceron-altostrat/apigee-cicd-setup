@@ -24,10 +24,9 @@ steps:
       - '-c'
       - |
         # Extract the revision number
-        REVISION=$(jq -r '.revision' /tmp/deploy-out.json)
-        echo "Extracted Revision: $REVISION"
+        echo "Extracted Revision: $(jq -r '.revision' /tmp/deploy-out.json)"
         echo "Deploying API Proxy ..."
-        apigeecli apis deploy -o "${_APIGEE_ORG}" -n "${_API_NAME}" -e "${_ENVIRONMENT}"  -r "$REVISION" --ovr -t $(cat token.txt)        
+        apigeecli apis deploy -o "${_APIGEE_ORG}" -n "${_API_NAME}" -e "${_ENVIRONMENT}"  -t $(cat token.txt)        
 
 substitutions:
   _APIGEE_ORG: 'apigee-sandbox-non-vpc'
