@@ -26,7 +26,7 @@ steps:
 
 substitutions:
   _APIGEE_ORG: 'apigee-sandbox-non-vpc'
-  _API_NAME: 'apigee-cloudbuild-test3'
+  _API_NAME: 'apigee-cloudbuild-test'
   _ENVIRONMENT: 'dev'
 
 options:
