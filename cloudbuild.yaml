@@ -18,8 +18,7 @@ steps:
       - '-c'
       - |
         echo "Listing Apigee Environments..."
-        APIGEE_TOKEN=$(cat /workspace/token.txt)
-        apigeecli environments list -o "${_APIGEE_ORG}" -t "$APIGEE_TOKEN"
+        apigeecli environments list -o "${_APIGEE_ORG}" -t $(cat /workspace/token.txt)
     volumes:
       - name: 'ws'
         path: /workspace
@@ -31,8 +30,7 @@ steps:
       - '-c'
       - |
         echo "Listing API Proxies..."
-        APIGEE_TOKEN=$(cat /workspace/token.txt)
-        apigeecli apis list -o "${_APIGEE_ORG}" -t "$APIGEE_TOKEN"
+        apigeecli apis list -o "${_APIGEE_ORG}" -t $(cat /workspace/token.txt)
     volumes:
       - name: 'ws'
         path: /workspace
