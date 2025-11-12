@@ -23,9 +23,27 @@ steps:
       - |
         echo "Listing API Proxies..."
         apigeecli apis list -o "${_APIGEE_ORG}" -t $(cat token.txt)
+  # Step 4: Create API Proxies Bundle using apigeecli
+  - name: 'ghcr.io/apigee/apigeecli:latest'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        echo "Creating Bundle API Proxie..."
+        apigeecli apis create bundle -o ${APIGEE_ORG} -n ${API_NAME} -p sample.zip -t $(cat token.txt)
+  # Step 4: Create API Proxies Bundle using apigeecli
+  - name: 'ghcr.io/apigee/apigeecli:latest'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        echo "Deploying API Proxie..."
+        apigeecli apis deploy -o ${APIGEE_ORG} -n ${API_NAME} -e ${ENVIRONMENT} -t $(cat token.txt)        
 
 substitutions:
   _APIGEE_ORG: 'apigee-sandbox-non-vpc' # Default value, will be overridden by trigger
+  _API_NAME: 'apigee-cloudbuild-test' # Default value, will be overridden by trigger
+  _ENVIRONMENT: 'dev' # Default value, will be overridden by trigger
 
 options:
   logging: CLOUD_LOGGING_ONLY
