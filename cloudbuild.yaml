@@ -1,27 +1,5 @@
 steps:
-  # Step 1: Download and set up apigeecli
-  - name: 'ubuntu'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        # Get the latest release download URL for Linux
-        APIGEECLI_DOWNLOAD_URL=$(curl -s https://api.github.com/repos/apigee/apigeecli/releases/latest | grep browser_download_url | grep _Linux_x86_64.tar.gz | cut -d '"' -f 4)
-        if [ -z "$APIGEECLI_DOWNLOAD_URL" ]; then
-          echo "Failed to get apigeecli download URL"
-          exit 1
-        fi
-        echo "Downloading apigeecli from $APIGEECLI_DOWNLOAD_URL"
-        curl -L -o apigeecli.tar.gz "$APIGEECLI_DOWNLOAD_URL"
-
-        # Extract and make executable
-        tar -xf apigeecli.tar.gz
-        chmod +x apigeecli
-        mv apigeecli /usr/local/bin/
-
-        echo "apigeecli setup complete: $(/usr/local/bin/apigeecli version)"
-
-  # Step 2: Get an auth token for the Cloud Build service account
+  # Step 1: Get an auth token for the Cloud Build service account
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     entrypoint: 'bash'
     args:
@@ -29,26 +7,35 @@ steps:
       - |
         gcloud auth print-access-token > /workspace/token.txt
         echo "Auth token generated."
+    volumes:
+      - name: 'ws'
+        path: /workspace
 
-  # Step 3: List Apigee Environments using apigeecli
-  - name: 'ubuntu'
+  # Step 2: List Apigee Environments using apigeecli
+  - name: 'ghcr.io/apigee/apigeecli:latest'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         echo "Listing Apigee Environments..."
         APIGEE_TOKEN=$(cat /workspace/token.txt)
-        /usr/local/bin/apigeecli environments list -o "${_APIGEE_ORG}" -t "$APIGEE_TOKEN"
+        apigeecli environments list -o "${_APIGEE_ORG}" -t "$APIGEE_TOKEN"
+    volumes:
+      - name: 'ws'
+        path: /workspace
 
-  # Step 4: List API Proxies using apigeecli
-  - name: 'ubuntu'
+  # Step 3: List API Proxies using apigeecli
+  - name: 'ghcr.io/apigee/apigeecli:latest'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         echo "Listing API Proxies..."
         APIGEE_TOKEN=$(cat /workspace/token.txt)
-        /usr/local/bin/apigeecli apis list -o "${_APIGEE_ORG}" -t "$APIGEE_TOKEN"
+        apigeecli apis list -o "${_APIGEE_ORG}" -t "$APIGEE_TOKEN"
+    volumes:
+      - name: 'ws'
+        path: /workspace
 
 substitutions:
   _APIGEE_ORG: 'apigee-sandbox-non-vpc' # Default value, will be overridden by trigger
