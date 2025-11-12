@@ -6,16 +6,20 @@ steps:
       - '-c'
       - |
         # Get the latest release download URL for Linux
-        APIGEECLI_URL=$(curl -s https://api.github.com/repos/apigee/apigeecli/releases/latest | grep browser_download_url | grep _Linux_x86_64.tar.gz | cut -d '"' -f 4)
-        echo "Downloading apigeecli from $APIGEECLI_URL"
-        curl -L -o apigeecli.tar.gz $APIGEECLI_URL
+        APIGEECLI_DOWNLOAD_URL=$(curl -s https://api.github.com/repos/apigee/apigeecli/releases/latest | grep browser_download_url | grep _Linux_x86_64.tar.gz | cut -d '"' -f 4)
+        if [ -z "$APIGEECLI_DOWNLOAD_URL" ]; then
+          echo "Failed to get apigeecli download URL"
+          exit 1
+        fi
+        echo "Downloading apigeecli from $APIGEECLI_DOWNLOAD_URL"
+        curl -L -o apigeecli.tar.gz "$APIGEECLI_DOWNLOAD_URL"
 
         # Extract and make executable
         tar -xf apigeecli.tar.gz
         chmod +x apigeecli
         mv apigeecli /usr/local/bin/
 
-        echo "apigeecli setup complete: $(apigeecli version)"
+        echo "apigeecli setup complete: $(/usr/local/bin/apigeecli version)"
 
   # Step 2: Get an auth token for the Cloud Build service account
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
