@@ -1,23 +1,9 @@
-substitutions:
-  _APIGEE_ORG: apigee-sandbox-non-vpc 
-  _APIGEE_ENV: test                     
+steps:
+- name: 'ubuntu'  # You can use any image that has echo, e.g., alpine, busybox
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - 'echo "Hello World from Cloud Build!"'
 
-# --- ADD THIS BLOCK ---
 options:
   logging: CLOUD_LOGGING_ONLY
-# ----------------------
-
-steps:
-  - name: 'gcr.io/cloud-builders/mvn'
-    id: 'unit-tests'
-    args: ['clean', 'test']
-
-  - name: 'gcr.io/cloud-builders/mvn'
-    id: 'deploy-apigee'
-    args:
-      - 'install'
-      - '-P${_APIGEE_ENV}'           
-      - '-Dorg=${_APIGEE_ORG}'       
-      - '-Denv=${_APIGEE_ENV}'       
-      - '-Dapigee.config.options=update' 
-      - '-DskipTests'
