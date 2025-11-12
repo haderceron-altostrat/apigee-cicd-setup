@@ -9,7 +9,7 @@ steps:
         echo "Auth token generated."   
   # Step 2: List Apigee Environments using apigeecli
   - name: 'ghcr.io/apigee/apigeecli:latest'
-    entrypoint: 'bash'
+    entrypoint: 'sh'
     args:
       - '-c'
       - |
@@ -17,7 +17,7 @@ steps:
         apigeecli environments list -o "${_APIGEE_ORG}" -t $(cat token.txt)
   # Step 3: List API Proxies using apigeecli
   - name: 'ghcr.io/apigee/apigeecli:latest'
-    entrypoint: 'bash'
+    entrypoint: 'sh'
     args:
       - '-c'
       - |
