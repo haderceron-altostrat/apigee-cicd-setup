@@ -13,6 +13,7 @@ steps:
     args:
       - '-c'
       - |
+        chmod 777 /workspace
         echo "Creating Bundle API Proxy..."
         apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p sample.zip -t $(cat token.txt) > /workspace/deploy-out.txt 
         echo "Create output:"
@@ -23,6 +24,7 @@ steps:
     args:
       - '-c'
       - |
+        chmod 777 /workspace
         # Extract the revision number
         echo "Extracted Revision: $(jq -r '.revision' /workspace/deploy-out.txt)"
         echo "Deploying API Proxy ..."
