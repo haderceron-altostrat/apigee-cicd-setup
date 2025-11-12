@@ -15,13 +15,13 @@ steps:
       - |
         echo "Creating Bundle API Proxy..."
         apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p sample.zip -t $(cat token.txt) > /tmp/deploy-out.txt 
-        echo "Extracted Revision: $(jq -r '.revision' /tmp/deploy-out.txt)"
+        echo "Bundle created with Revision: $(jq -r '.revision' /tmp/deploy-out.txt)"
         echo "Deploying API Proxy ..."
         apigeecli apis deploy -o "${_APIGEE_ORG}" -n "${_API_NAME}" -e "${_ENVIRONMENT}" --ovr -v $(jq -r '.revision' /tmp/deploy-out.txt) -t $(cat token.txt) 
   
 substitutions:
-  _APIGEE_ORG: 'apigee-sandbox-non-vpc'
-  _ENVIRONMENT: 'dev'
+  _APIGEE_ORG: '[ADD_DEFAULT_VALUE]'
+  _ENVIRONMENT: '[ADD_DEFAULT_VALUE]'
 
 options:
   logging: CLOUD_LOGGING_ONLY
