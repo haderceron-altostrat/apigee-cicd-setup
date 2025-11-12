@@ -7,29 +7,18 @@ steps:
       - |
         gcloud auth print-access-token > token.txt
         echo "Auth token generated."   
-  # Step 2: Create API Proxies Bundle using apigeecli
+  # Step 2: Deploy API Proxies Bundle using apigeecli
   - name: 'ghcr.io/apigee/apigeecli:latest'
     entrypoint: 'sh'
     args:
       - '-c'
       - |
-        chmod 777 /workspace
         echo "Creating Bundle API Proxy..."
-        apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p sample.zip -t $(cat token.txt) > /workspace/deploy-out.txt 
-        echo "Create output:"
-        cat /workspace/deploy-out.txt
-  # Step 3: Create API Proxies Bundle using apigeecli
-  - name: 'ghcr.io/apigee/apigeecli:latest'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        chmod 777 /workspace
-        # Extract the revision number
-        echo "Extracted Revision: $(jq -r '.revision' /workspace/deploy-out.txt)"
+        apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p sample.zip -t $(cat token.txt) > /tmp/deploy-out.txt 
+        echo "Extracted Revision: $(jq -r '.revision' /tmp/deploy-out.txt)"
         echo "Deploying API Proxy ..."
-        apigeecli apis deploy -o "${_APIGEE_ORG}" -n "${_API_NAME}" -e "${_ENVIRONMENT}"  -t $(cat token.txt)        
-
+        apigeecli apis deploy -o "${_APIGEE_ORG}" -n "${_API_NAME}" -e "${_ENVIRONMENT}"  -t $(cat token.txt) 
+  
 substitutions:
   _APIGEE_ORG: 'apigee-sandbox-non-vpc'
   _ENVIRONMENT: 'dev'
