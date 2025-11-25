@@ -1,4 +1,21 @@
 steps:
+  # Step 1: Detect changes in the Patients proxy folder
+  - name: 'gcr.io/cloud-builders/git'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Check for changes in the specific proxy folder
+        # We use || true to ensure the build doesn't fail if git diff returns exit code 1 (differences found) or 0 (no differences)
+        # However, --quiet returns 1 if changed, 0 if not.
+        # We want to create the file ONLY if changed.
+        
+        if git diff HEAD~ HEAD --quiet --name-only -- Proxies/patients; then
+          echo "No changes detected in Proxies/patients"
+        else
+          echo "Changes detected in Proxies/patients"
+          touch execute_patients.txt
+        fi
   # Step 1: Get an auth token for the Cloud Build service account
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     entrypoint: 'bash'
@@ -13,12 +30,15 @@ steps:
     args:
       - '-c'
       - |
-        echo "Creating Bundle API Proxy..."
-        apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p sample.zip -t $(cat token.txt) > /tmp/deploy-out.txt 
-        echo "Bundle created with Revision: $(jq -r '.revision' /tmp/deploy-out.txt)"
-        echo "Deploying API Proxy ..."
-        apigeecli apis deploy -o "${_APIGEE_ORG}" -n "${_API_NAME}" -e "${_ENVIRONMENT}" --ovr -v $(jq -r '.revision' /tmp/deploy-out.txt) -t $(cat token.txt) 
-  
+        if [ -f execute_patients.txt ]; then
+          echo "Creating Bundle API Proxy..."
+          apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p /Proxies/patients/sample.zip -t $(cat token.txt) > /tmp/deploy-out.txt 
+          echo "Bundle created with Revision: $(jq -r '.revision' /tmp/deploy-out.txt)"
+          echo "Deploying API Proxy ..."
+          apigeecli apis deploy -o "${_APIGEE_ORG}" -n "${_API_NAME}" -e "${_ENVIRONMENT}" --ovr -v $(jq -r '.revision' /tmp/deploy-out.txt) -t $(cat token.txt) 
+        else
+          echo "Skipping deployment for ${_API_NAME}."
+        fi
 substitutions:
   _APIGEE_ORG: '[ADD_DEFAULT_VALUE]'
   _ENVIRONMENT: '[ADD_DEFAULT_VALUE]'
