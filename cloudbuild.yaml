@@ -9,6 +9,7 @@ steps:
         # We use || true to ensure the build doesn't fail if git diff returns exit code 1 (differences found) or 0 (no differences)
         # However, --quiet returns 1 if changed, 0 if not.
         # We want to create the file ONLY if changed.
+        git fetch --depth=2 origin main || git fetch --depth=2 # Fallback if origin main is not defined
         
         if git diff HEAD~ HEAD --quiet --name-only -- Proxies/patients; then
           echo "No changes detected in Proxies/patients"
@@ -32,7 +33,7 @@ steps:
       - |
         if [ -f execute_patients.txt ]; then
           echo "Creating Bundle API Proxy..."
-          apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p /Proxies/patients/sample.zip -t $(cat token.txt) > /tmp/deploy-out.txt 
+          apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "${_API_NAME}" -p Proxies/patients/sample.zip -t $(cat token.txt) > /tmp/deploy-out.txt 
           echo "Bundle created with Revision: $(jq -r '.revision' /tmp/deploy-out.txt)"
           echo "Deploying API Proxy ..."
           apigeecli apis deploy -o "${_APIGEE_ORG}" -n "${_API_NAME}" -e "${_ENVIRONMENT}" --ovr -v $(jq -r '.revision' /tmp/deploy-out.txt) -t $(cat token.txt) 
