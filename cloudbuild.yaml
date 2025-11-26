@@ -43,33 +43,33 @@ steps:
       - '-c'
       - |
         if [ -s changed_proxies.txt ]; then
-          TOKEN=$(cat token.txt)
+          TOKEN=$$(cat token.txt)
           
           # Loop through each changed proxy
           while IFS= read -r PROXY_NAME; do
             echo "------------------------------------------------"
-            echo "Processing Proxy: $PROXY_NAME"
+            echo "Processing Proxy: $$PROXY_NAME"
             echo "------------------------------------------------"
             
-            PROXY_DIR="Proxies/$PROXY_NAME"
+            PROXY_DIR="Proxies/$$PROXY_NAME"
             
             # Find the first zip file in the directory
-            ZIP_FILE=$(find "$PROXY_DIR" -maxdepth 1 -name "*.zip" | head -n 1)
+            ZIP_FILE=$$(find "$$PROXY_DIR" -maxdepth 1 -name "*.zip" | head -n 1)
             
-            if [ -f "$ZIP_FILE" ]; then
-              echo "Found bundle: $ZIP_FILE"
+            if [ -f "$$ZIP_FILE" ]; then
+              echo "Found bundle: $$ZIP_FILE"
               
-              echo "Creating/Updating Bundle for $PROXY_NAME..."
+              echo "Creating/Updating Bundle for $$PROXY_NAME..."
               # Note: Using PROXY_NAME as the API Name in Apigee
-              apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "$PROXY_NAME" -p "$ZIP_FILE" -t "$TOKEN" > /tmp/deploy-out.txt
+              apigeecli apis create bundle -o "${_APIGEE_ORG}" -n "$$PROXY_NAME" -p "$$ZIP_FILE" -t "$$TOKEN" > /tmp/deploy-out.txt
               
-              REVISION=$(jq -r '.revision' /tmp/deploy-out.txt)
-              echo "Bundle created with Revision: $REVISION"
+              REVISION=$$(jq -r '.revision' /tmp/deploy-out.txt)
+              echo "Bundle created with Revision: $$REVISION"
               
-              echo "Deploying $PROXY_NAME to ${_ENVIRONMENT}..."
-              apigeecli apis deploy -o "${_APIGEE_ORG}" -n "$PROXY_NAME" -e "${_ENVIRONMENT}" --ovr -v "$REVISION" -t "$TOKEN"
+              echo "Deploying $$PROXY_NAME to ${_ENVIRONMENT}..."
+              apigeecli apis deploy -o "${_APIGEE_ORG}" -n "$$PROXY_NAME" -e "${_ENVIRONMENT}" --ovr -v "$$REVISION" -t "$$TOKEN"
             else
-              echo "Warning: No .zip file found in $PROXY_DIR. Skipping."
+              echo "Warning: No .zip file found in $$PROXY_DIR. Skipping."
             fi
             
           done < changed_proxies.txt
